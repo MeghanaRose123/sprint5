@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Clone - Side by Side</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #128C7E 0%, #075E54 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .main-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* .container ruleset removed because it was empty */
+
+        .main-container {
+            flex: 1;
+            background-color: white;
+            border-radius: 0 12px 12px 0;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background-color: #128C7E;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header i {
+            font-size: 28px;
+        }
+
+        .chat-container {
+            display: flex;
+            height: 600px;
+        }
+
+        .chat-side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .chat-side:last-child {
+            border-right: none;
+        }
+
+        .user-header {
+            padding: 15px;
+            background-color: #f0f2f5;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #128C7E;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .user-info h3 {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .user-info p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.sent {
+            background-color: #DCF8C6;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.received {
+            background-color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .message-text {
+            margin-bottom: 4px;
+            line-height: 1.4;
+            font-size: 15px;
+        }
+
+        .message-meta {
+            font-size: 11px;
+            color: #667781;
+            text-align: right;
+        }
+
+        .moderated {
+            border-left: 3px solid #ff6b6b;
+        }
+
+        .moderation-note {
+            font-size: 12px;
+            color: #e74c3c;
+            font-style: italic;
+            margin-top: 4px;
+        }
+
+        .input-container {
+            padding: 15px;
+            background-color: #f0f2f5;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 24px;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .message-input:focus {
+            border-color: #128C7E;
+        }
+
+        .send-button {
+            background-color: #128C7E;
+            color: white;
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .send-button:hover {
+            background-color: #075E54;
+        }
+
+        .send-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .ai-indicator {
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #666;
+        }
+
+        .ai-indicator i {
+            color: #128C7E;
+        }
+
+        .warning-banner {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+            padding: 12px 16px;
+            margin: 0 15px 15px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #667781;
+            margin-top: 40px;
+        }
+
+        .empty-state p {
+            margin-bottom: 8px;
+        }
+
+        .empty-state .hint {
+            font-size: 14px;
+            color: #999;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            width: 340px;
+            background: #f8f9fa; /* changed from #222e35 */
+            color: #222e35;      /* changed from #fff */
+            border-radius: 12px 0 0 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.07); /* lighter shadow */
+            display: flex;
+            flex-direction: column;
+            margin-right: 20px;
+            min-height: 640px;
+        }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 18px 10px 18px;
+            background: #fff; /* added for light theme */
+            color: #222e35;   /* added for light theme */
+        }
+        .sidebar-header .sidebar-title {
+            flex: 1;
+        }
+        .sidebar-header .sidebar-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .sidebar-title {
+            font-size: 22px;
+            font-weight: 600;
+        }
+        .sidebar-newchat, .sidebar-menu {
+            background: none;
+            border: none;
+            color: #222e35; /* changed from #fff */
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: 0; /* remove margin-left, use gap instead */
+            padding: 0 6px;
+        }
+        .sidebar-search {
+            padding: 0 18px 12px 18px;
+        }
+        .sidebar-search input {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0; /* changed from none */
+            background: #fff;           /* changed from #2a3942 */
+            color: #222e35;             /* changed from #fff */
+            font-size: 15px;
+        }
+        .sidebar-chats {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 0 10px 0;
+            max-height: 500px; /* ensures scrolling if list is long */
+            scrollbar-width: thin;
+            scrollbar-color: #d6eaf8 #f8f9fa;
+        }
+        /* Chrome, Edge, Safari */
+        .sidebar-chats::-webkit-scrollbar {
+            width: 8px;
+            background: #f8f9fa;
+        }
+        .sidebar-chats::-webkit-scrollbar-thumb {
+            background: #d6eaf8;
+            border-radius: 6px;
+        }
+        .sidebar-chats::-webkit-scrollbar-thumb:hover {
+            background: #b3d1e6;
+        }
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 18px;
+            cursor: pointer;
+            border-bottom: 1px solid #e0e0e0; /* changed from #2a3942 */
+            transition: background 0.2s;
+            background: #f8f9fa; /* added for light theme */
+            color: #222e35;      /* added for light theme */
+        }
+        .chat-item.active, .chat-item:hover {
+            background: #e9ecef; /* changed from #202c33 */
+        }
+        .chat-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            margin-right: 12px;
+            object-fit: cover;
+            background: #d6eaf8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .chat-avatar img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+        }
+        .chat-avatar-default {
+            background: #aebac1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #fff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+        }
+        .chat-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .chat-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #222e35; /* changed from #fff */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .chat-preview {
+            font-size: 13px;
+            color: #667781; /* changed from #aebac1 */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .chat-meta {
+            font-size: 12px;
+            color: #667781; /* changed from #aebac1 */
+            margin-left: 10px;
+            white-space: nowrap;
+        }
+        @media (max-width: 1100px) {
+            .sidebar {
+                display: none;
+            }
+            .main-container {
+                border-radius: 12px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .chat-side {
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="harassment-score-container" style="padding: 16px; background: #fffbe6; border-bottom: 1px solid #f0e68c; text-align: center; margin-bottom: 8px;">
+        <span style="font-weight: bold; color: #b22222;">Harassment Score:</span>
+        <span id="harassment-score" style="font-size: 1.2em; color: #b22222;">0</span>
+    </div>
+    <div class="main-wrapper">
+        <!-- Sidebar (Chat List) -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Chats</span>
+                <span class="sidebar-actions">
+                    <button class="sidebar-newchat"><i class="fas fa-edit"></i></button>
+                    <button class="sidebar-menu"><i class="fas fa-bars"></i></button>
+                </span>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" placeholder="Search or start a new chat">
+            </div>
+            <div class="sidebar-chats" id="sidebarChats">
+                <div class="chat-item active">
+                    <div class="chat-avatar"><img src="https://randomuser.me/api/portraits/men/1.jpg" alt="avatar"></div>
+                    <div class="chat-info">
+                        <div class="chat-name">Dinesh Karthik </div>
+                        <div class="chat-preview">Available</div>
+                    </div>
+                    <div class="chat-meta">22:19</div>
+                </div>
+                <div class="chat-item">
+                    <div class="chat-avatar"><img src="https://randomuser.me/api/portraits/women/1.jpg" alt="avatar"></div>
+                    <div class="chat-info">
+                        <div class="chat-name">Maggi</div>
+                        <div class="chat-preview">Busy</div>
+                    </div>
+                    <div class="chat-meta">21:39</div>
+                </div>
+                <div class="chat-item">
+                    <div class="chat-avatar"><img src="https://res.cloudinary.com/dlsn7z8dg/image/upload/v1758393836/Screenshot_2025-09-21_001100_mjc8pr.png" alt="avatar"></div>
+                    <div class="chat-info">
+                        <div class="chat-name">Mohan</div>
+                        <div class="chat-preview">Phone at silent</div>
+                    </div>
+                    <div class="chat-meta">21:36</div>
+                </div>
+                <div class="chat-item">
+                    <div class="chat-avatar"><img src="https://randomuser.me/api/portraits/men/3.jpg" alt="avatar"></div>
+                    <div class="chat-info">
+                        <div class="chat-name">Harshad</div>
+                        <div class="chat-preview">Urgent calls Only</div>
+                    </div>
+                    <div class="chat-meta">19:23</div>
+                </div>
+                <div class="chat-item">
+                    <div class="chat-avatar"><img src="https://randomuser.me/api/portraits/men/4.jpg" alt="avatar"></div>
+                    <div class="chat-info">
+                        <div class="chat-name">Cherry</div>
+                        <div class="chat-preview">In a meeting</div>
+                    </div>
+                    <div class="chat-meta">Monday</div>
+                </div>
+                <div class="chat-item">
+                    <div class="chat-avatar"><img src="https://randomuser.me/api/portraits/men/5.jpg" alt="avatar"></div>
+                    <div class="chat-info">
+                        <div class="chat-name">Gowtham</div>
+                        <div class="chat-preview">Battery about to die..</div>
+                    </div>
+                    <div class="chat-meta">Yesterday</div>
+                </div>
+                <div class="chat-item">
+                    <div class="chat-avatar"><img src="https://res.cloudinary.com/dlsn7z8dg/image/upload/v1758393836/Screenshot_2025-09-21_001031_m1culh.png" alt="avatar"></div>
+                    <div class="chat-info">
+                        <div class="chat-name">Nitish</div>
+                        <div class="chat-preview">At the movies</div>
+                    </div>
+                    <div class="chat-meta">Yesterday</div>
+                </div>
+                <div class="chat-item">
+                    <div class="chat-avatar"><img src="https://res.cloudinary.com/dlsn7z8dg/image/upload/v1758393836/Screenshot_2025-09-21_001004_p0sxrw.png" alt="avatar"></div>
+                    <div class="chat-info">
+                        <div class="chat-name">Jaswanth</div>
+                        <div class="chat-preview">At the gym</div>
+                    </div>
+                    <div class="chat-meta">Yesterday</div>
+                </div>
+                <div class="chat-item">
+                    <div class="chat-avatar"><img src="https://res.cloudinary.com/dlsn7z8dg/image/upload/v1758393836/Screenshot_2025-09-21_000905_fywvt9.png" alt="avatar"></div>
+                    <div class="chat-info">
+                        <div class="chat-name">Shyam</div>
+                        <div class="chat-preview">Can't talk, WhatsApp Only</div>
+                    </div>
+                    <div class="chat-meta">Yesterday</div>
+                </div>
+            </div>
+        </div>
+        <!-- Main Chat Container -->
+        <div class="main-container">
+            <div class="header">
+                <i class="fab fa-whatsapp"></i>
+                <h1>WhatsApp </h1>
+            </div>
+
+            <!-- AI ai-indicator -->
+            
+
+            <div class="warning-banner" id="warningBanner">
+                <i class="fas fa-exclamation-triangle"></i>
+                Your message was flagged for harmful content. A moderated version will be sent.
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-side">
+                    <div class="user-header">
+                        <div class="avatar">Y</div>
+                        <div class="user-info">
+                            <h3>You (Sender)</h3>
+                            <p>Online</p>
+                        </div>
+                    </div>
+                    <div class="messages-container" id="senderMessages">
+                        <div class="empty-state">
+                            <p>Send a message to start the conversation</p>
+                            <p class="hint">Try using words like "hate" or "harm" to see content moderation</p>
+                        </div>
+                    </div>
+                    <div class="input-container">
+                        <input type="text" class="message-input" id="senderInput" placeholder="Type a message...">
+                        <button class="send-button" id="sendButton">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="chat-side">
+                    <div class="user-header">
+                        <div class="avatar">F</div>
+                        <div class="user-info">
+                            <h3>Friend (Receiver)</h3>
+                            <p>Online</p>
+                        </div>
+                    </div>
+                    <div class="messages-container" id="receiverMessages">
+                        <div class="empty-state">
+                            <p>Waiting for a message...</p>
+                            <p class="hint">Messages will appear here after being moderated</p>
+                        </div>
+                    </div>
+                    <div class="input-container">
+                        <input type="text" class="message-input" id="receiverInput" placeholder="Type a response..." disabled>
+                        <button class="send-button" id="receiverSendButton" disabled>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Harassment score update function
+        function setHarassmentScore(score) {
+            document.getElementById('harassment-score').textContent = score;
+        }
+
+        // Inappropriate words list
+        const badWords = ["idiot", "stupid", "hate", "violent", "attack", "harm", "hurt", "abuse", "threat", "kill", "fight", "danger", "dangerous", "weapon"];
+
+        // Calculate harassment score for a message (0.25 per word)
+        function calculateHarassmentScore(text) {
+            let score = 0;
+            badWords.forEach(word => {
+                if (text.toLowerCase().includes(word)) {
+                    score += 0.25;
+                }
+            });
+            return score;
+        }
+
+        // Track cumulative harassment score
+        let cumulativeHarassmentScore = 0;
+
+        // Show warning or block message
+        function showHarassmentWarning(score) {
+            let warning = document.getElementById('harassment-warning');
+            if (!warning) {
+                warning = document.createElement('div');
+                warning.id = 'harassment-warning';
+                warning.style = 'background:#fff3cd;color:#856404;padding:10px 0;text-align:center;font-weight:bold;';
+                document.body.insertBefore(warning, document.body.firstChild.nextSibling);
+            }
+            if (score < 1) {
+                warning.style.display = 'none';
+            } else if (score >= 1 && score < 2) {
+                warning.textContent = 'Soft Warning: Your cumulative harassment score is high.';
+                warning.style.display = 'block';
+            } else if (score >= 2) {
+                warning.textContent = 'Blocked: Your cumulative harassment score is too high. Message not sent!';
+                warning.style.display = 'block';
+            }
+        }
+        // State management
+        let messages = [];
+        let messageIdCounter = 0;
+
+        // DOM elements
+        const senderMessages = document.getElementById('senderMessages');
+        const receiverMessages = document.getElementById('receiverMessages');
+        const senderInput = document.getElementById('senderInput');
+        const receiverInput = document.getElementById('receiverInput');
+        const sendButton = document.getElementById('sendButton');
+        const receiverSendButton = document.getElementById('receiverSendButton');
+        const warningBanner = document.getElementById('warningBanner');
+
+        // Store messages per profile
+        let profileMessages = Array.from({length: 9}, () => []);
+
+        // Track current profile index
+        let currentProfileIndex = 0;
+
+        // Initialize
+        function init() {
+            setupEventListeners();
+            // Add sample messages to demonstrate the interface
+            addSampleMessages();
+        }
+
+        // Add sample messages for demonstration
+        function addSampleMessages() {
+            const sampleMessages = [
+                { text: "Hey there! How are you?", sender: "sent", moderated: false },
+                { text: "I'm doing great! Thanks for asking.", sender: "received", moderated: false },
+                { text: "Did you hear about that new movie?", sender: "sent", moderated: false }
+            ];
+
+            sampleMessages.forEach(msg => {
+                addMessageToUI(msg.text, msg.sender, msg.moderated);
+            });
+            
+            // Clear empty states
+            document.querySelectorAll('.empty-state').forEach(el => el.style.display = 'none');
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            senderInput.addEventListener('input', handleInputChange);
+            senderInput.addEventListener('keypress', handleKeyPress);
+            sendButton.addEventListener('click', sendMessage);
+            receiverInput.addEventListener('input', handleReceiverInputChange);
+            receiverInput.addEventListener('keypress', handleReceiverKeyPress);
+            receiverSendButton.addEventListener('click', simulateReceiverResponse);
+        }
+
+        function handleInputChange() {
+            sendButton.disabled = !senderInput.value.trim();
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter' && !sendButton.disabled) {
+                sendMessage();
+            }
+        }
+
+        function handleReceiverInputChange() {
+            receiverSendButton.disabled = !receiverInput.value.trim();
+        }
+
+        function handleReceiverKeyPress(e) {
+            if (e.key === 'Enter' && !receiverSendButton.disabled) {
+                simulateReceiverResponse();
+            }
+        }
+
+        // Mock AI content moderation
+        async function checkMessageContent(message) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const harmfulPatterns = [
+                        'hate', 'violent', 'attack', 'harm', 'hurt', 'abuse', 'threat',
+                        'kill', 'fight', 'danger', 'dangerous', 'weapon', 'stupid', 'idiot'
+                    ];
+                    
+                    const isHarmful = harmfulPatterns.some(pattern => 
+                        message.toLowerCase().includes(pattern)
+                    );
+                    
+                    resolve({
+                        isHarmful,
+                        safeMessage: isHarmful ? 
+                            "This message was moderated for potentially harmful content." : 
+                            message
+                    });
+                }, 500); // Simulate API delay
+            });
+        }
+
+        // Send message with harassment score logic
+        async function sendMessage() {
+            const originalMessage = senderInput.value.trim();
+            if (!originalMessage) return;
+
+            // Calculate harassment score for this message
+            const messageScore = calculateHarassmentScore(originalMessage);
+            cumulativeHarassmentScore += messageScore;
+            setHarassmentScore(cumulativeHarassmentScore);
+            showHarassmentWarning(cumulativeHarassmentScore);
+
+            if (cumulativeHarassmentScore >= 2) {
+                // Block message
+                return;
+            }
+
+            senderInput.value = '';
+            sendButton.disabled = true;
+            warningBanner.style.display = 'none';
+
+            // Check message content (keep for moderation note)
+            const moderationResult = await checkMessageContent(originalMessage);
+
+            if (moderationResult.isHarmful) {
+                warningBanner.style.display = 'flex';
+                setTimeout(() => {
+                    warningBanner.style.display = 'none';
+                }, 3000);
+            }
+
+            // Add message to UI
+            addMessageToUI(originalMessage, 'sent', moderationResult.isHarmful, false);
+
+            // Add moderated message to receiver side
+            setTimeout(() => {
+                addMessageToUI(moderationResult.safeMessage, 'received', moderationResult.isHarmful, true);
+
+                // Enable receiver input and send button after a short delay
+                setTimeout(() => {
+                    receiverInput.disabled = false;
+                    receiverInput.focus();
+                    handleReceiverInputChange(); // update send button state
+                }, 800);
+            }, 800);
+        }
+
+        // Simulate receiver response
+        function simulateReceiverResponse() {
+            const response = receiverInput.value.trim();
+            if (!response) return;
+
+            receiverInput.value = '';
+            receiverInput.disabled = true;
+            receiverSendButton.disabled = true;
+
+            // Add response to receiver side as sent
+            addMessageToUI(response, 'sent', false, true);
+            
+            // Add response to sender side as received
+            setTimeout(() => {
+                addMessageToUI(response, 'received', false, false);
+            }, 800);
+        }
+
+        // Update chat area for selected profile
+        function renderProfileMessages() {
+            // Clear message containers
+            senderMessages.innerHTML = '';
+            receiverMessages.innerHTML = '';
+
+            const msgs = profileMessages[currentProfileIndex];
+            if (!msgs || msgs.length === 0) {
+                senderMessages.innerHTML = `<div class="empty-state">
+                    <p>Send a message to start the conversation</p>
+                    <p class="hint">Try using words like "hate" or "harm" to see content moderation</p>
+                </div>`;
+                receiverMessages.innerHTML = `<div class="empty-state">
+                    <p>Waiting for a message...</p>
+                    <p class="hint">Messages will appear here after being moderated</p>
+                </div>`;
+            } else {
+                msgs.forEach(msg => {
+                    addMessageToUI(msg.text, msg.type, msg.isModerated, msg.isReceiverSide, msg.timestamp, false);
+                });
+            }
+            senderInput.value = '';
+            receiverInput.value = '';
+            senderInput.disabled = false;
+            receiverInput.disabled = true;
+            sendButton.disabled = true;
+            receiverSendButton.disabled = true;
+        }
+
+        // Override addMessageToUI to support rendering from history
+        function addMessageToUI(text, type, isModerated = false, isReceiverSide = false, timestamp = null, save = true) {
+            if (!timestamp) timestamp = new Date();
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${type} ${isModerated ? 'moderated' : ''}`;
+
+            const textElement = document.createElement('p');
+            textElement.className = 'message-text';
+            textElement.textContent = text;
+
+            const metaElement = document.createElement('p');
+            metaElement.className = 'message-meta';
+            metaElement.textContent = `${type === 'sent' ? 'You' : 'Friend'} • ${formatTime(timestamp)}`;
+
+            messageElement.appendChild(textElement);
+
+            if (isModerated) {
+                const noteElement = document.createElement('p');
+                noteElement.className = 'moderation-note';
+                noteElement.textContent = 'Moderated by AI';
+                messageElement.appendChild(noteElement);
+            }
+
+            messageElement.appendChild(metaElement);
+
+            const container = isReceiverSide ? receiverMessages : senderMessages;
+            const emptyState = container.querySelector('.empty-state');
+            if (emptyState) emptyState.style.display = 'none';
+
+            container.appendChild(messageElement);
+            container.scrollTop = container.scrollHeight;
+
+            // Save only if not rendering from history
+            if (save) {
+                profileMessages[currentProfileIndex].push({
+                    text, type, isModerated, isReceiverSide, timestamp
+                });
+            }
+        }
+
+        function formatTime(date) {
+            return date.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Profile data for sidebar chats
+        const profiles = [
+            { name: "Dinesh Karthik", avatar: "https://randomuser.me/api/portraits/men/1.jpg" },
+            { name: "Maggi", avatar: "https://randomuser.me/api/portraits/women/1.jpg"  },
+            { name: "Mohan", avatar: "https://res.cloudinary.com/dlsn7z8dg/image/upload/v1758393836/Screenshot_2025-09-21_001100_mjc8pr.png" },
+            { name: "Harshad", avatar: "https://randomuser.me/api/portraits/men/3.jpg" },
+            { name: "Cherry", avatar: "https://randomuser.me/api/portraits/men/4.jpg" },
+            { name: "Gowtham", avatar: "https://randomuser.me/api/portraits/men/5.jpg" },
+            { name: "Nitish", avatar:  "https://res.cloudinary.com/dlsn7z8dg/image/upload/v1758393836/Screenshot_2025-09-21_001031_m1culh.png"},
+            { name: "Jaswanth", avatar: "https://res.cloudinary.com/dlsn7z8dg/image/upload/v1758393836/Screenshot_2025-09-21_001004_p0sxrw.png" },
+            { name: "Shyam", avatar: "https://res.cloudinary.com/dlsn7z8dg/image/upload/v1758393836/Screenshot_2025-09-21_000905_fywvt9.png" }
+        ];
+
+        // DOM elements for chat area
+        const senderAvatar = document.querySelector('.chat-side .user-header .avatar');
+        const senderName = document.querySelector('.chat-side .user-header .user-info h3');
+        const receiverAvatar = document.querySelectorAll('.chat-side .user-header .avatar')[1];
+        const receiverName = document.querySelectorAll('.chat-side .user-header .user-info h3')[1];
+
+        // Sidebar chat click logic
+        document.getElementById('sidebarChats').addEventListener('click', function(e) {
+            let chatItem = e.target.closest('.chat-item');
+            if (!chatItem) return;
+
+            // Remove active from all
+            document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+            chatItem.classList.add('active');
+
+            // Find index
+            const index = Array.from(this.children).indexOf(chatItem);
+            const profile = profiles[index];
+            currentProfileIndex = index;
+
+            // Set sender and receiver info
+            if (profile.avatar) {
+                senderAvatar.innerHTML = `<img src="${profile.avatar}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">`;
+            } else {
+                senderAvatar.innerHTML = `<i class="fas fa-user"></i>`;
+            }
+            senderName.textContent = profile.name + " (Sender)";
+            receiverAvatar.textContent = "F";
+            receiverName.textContent = "Friend (Receiver)";
+
+            renderProfileMessages();
+        });
+
+
+        // On load, show messages for first profile
+        window.addEventListener('DOMContentLoaded', renderProfileMessages);
+
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>
